@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp5.0</TargetFramework>
+        <UserSecretsId>dotnet-WrapperApplication-FC97C679-D642-441E-9069-8BB9C9462967</UserSecretsId>
+        <LangVersion>9</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="ConsoleTables" Version="2.4.2" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+        <PackageReference Include="Serilog" Version="2.10.1-dev-01256" />
+        <PackageReference Include="Serilog.Extensions.Hosting" Version="4.0.0-dev-00051" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0-dev-00839" />
+        <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.2-dev-00020" />
+        <PackageReference Include="Serilog.Sinks.File" Version="5.0.0-dev-00905" />
+        <PackageReference Include="System.Reactive" Version="5.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SharpScheduler.Common\SharpScheduler.Common.csproj" />
+        <ProjectReference Include="..\SharpScheduler.Handlers\SharpScheduler.Handlers.csproj" />
+    </ItemGroup>
+</Project>
