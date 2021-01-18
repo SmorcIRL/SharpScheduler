@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SmorcIRL.SharpScheduler.Handlers
 {
@@ -11,7 +12,7 @@ namespace SmorcIRL.SharpScheduler.Handlers
         /// <summary>
         ///     <param name="command">Command to handle</param>
         /// </summary>
-        public HandlesAttribute(string command)
+        public HandlesAttribute([NotNull] string command)
         {
             Command = command;
         }
@@ -28,7 +29,7 @@ namespace SmorcIRL.SharpScheduler.Handlers
         /// <summary>
         ///     <param name="handlerType">Type, that implements <c>IHandler</c></param>
         /// </summary>
-        public HandlerDeclarationAttribute(Type handlerType)
+        public HandlerDeclarationAttribute([NotNull] Type handlerType)
         {
             HandlerType = handlerType;
         }

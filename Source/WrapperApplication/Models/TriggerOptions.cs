@@ -15,7 +15,7 @@ namespace WrapperApplication.Models
     public class SimpleTrigger : TriggerOptions
     {
         public TimeSpan Delay { get; set; }
-        public TimeSpan Interval { get; set; }
+        public TimeSpan Interval { get; set; } = Timeout.InfiniteTimeSpan;
         public int Ticks { get; set; } = -1;
 
         public override void GetParams(out DateTime firstTick, out TimeSpan interval, out int maxTicks)

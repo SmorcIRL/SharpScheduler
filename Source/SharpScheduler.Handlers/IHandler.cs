@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,7 +36,7 @@ namespace SmorcIRL.SharpScheduler.Handlers
         ///     <param name="args">Command args</param>
         ///     <param name="token">Token, that will be canceled right before Dispose() call</param>
         /// </summary>
-        Task<string> Handle(string command, string[] args, CancellationToken token)
+        Task<string> Handle([NotNull] string command, [NotNull] string[] args, CancellationToken token)
         {
             throw new ImpossibleToHandleException(command);
         }

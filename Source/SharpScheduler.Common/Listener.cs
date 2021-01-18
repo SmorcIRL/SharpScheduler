@@ -14,11 +14,11 @@ namespace SharpScheduler.Common
             _listeningCTS = new CancellationTokenSource();
         }
 
-        public int Port { get; private set; }
+        protected int Port { get; private set; }
 
-        public void StartListening(int preferredPort = -1)
+        protected void Start(int preferredPort = -1)
         {
-            StartListenerOnFreePort(preferredPort);
+            StartOnFreePort(preferredPort);
 
             _ = Task.Run(async () =>
             {
@@ -29,42 +29,28 @@ namespace SharpScheduler.Common
                         var getContext = _listener.GetContextAsync();
                         var waitForStop = _listeningCTS.Token.WaitForCancelerationAsync();
 
-                        var first = await Task.WhenAny(getContext, waitForStop);
-
-                        if (first == waitForStop)
+                        if (await Task.WhenAny(getContext, waitForStop) == waitForStop)
                         {
                             return;
                         }
 
-                        var context = await getContext;
-
-                        _ = Task.Run(async () =>
-                        {
-                            await HandleContextAsync(context);
-
-                            context.Response.Close();
-                        });
+                        _ = HandleContextAndCloseAsync(await getContext);
                     }
                 }
                 finally
                 {
                     _listener.Close();
-
-                    _listener.Prefixes.Clear();
-
                     _listener = null;
-
                     Port = -1;
                 }
             });
         }
-
-        public void StopListening()
+        protected void Close()
         {
             _listeningCTS.Cancel();
         }
 
-        private void StartListenerOnFreePort(int preferredPort)
+        private void StartOnFreePort(int preferredPort)
         {
             int port = preferredPort;
 
@@ -72,12 +58,13 @@ namespace SharpScheduler.Common
             {
                 try
                 {
-                    _listener = new HttpListener();
-                    _listener.Prefixes.Add(Helper.CreateRootPrefixOnPort(port));
+                    var listener = new HttpListener();
+                    listener.Prefixes.Add(Helper.CreateRootPrefixOnPort(port));
+                    listener.Start();
 
-                    _listener.Start();
-
+                    _listener = listener;
                     Port = port;
+
                     break;
                 }
                 catch
@@ -88,5 +75,16 @@ namespace SharpScheduler.Common
         }
 
         protected abstract Task HandleContextAsync(HttpListenerContext context);
+        private async Task HandleContextAndCloseAsync(HttpListenerContext context)
+        {
+            try
+            {
+                await HandleContextAsync(context);
+            }
+            finally
+            {
+                context.Response.Close();
+            }
+        }
     }
 }

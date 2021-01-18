@@ -49,7 +49,6 @@ namespace Service.Project
             }
             finally
             {
-                Log.Information(LogStrings.Finished);
                 Log.CloseAndFlush();
             }
         }
@@ -62,8 +61,8 @@ namespace Service.Project
                 {
                     services.AddOptions<ServiceOptions>().Bind(context.Configuration);
                     services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<ServiceOptions>, ServiceOptionsValidator>());
-                    services.AddSingleton<ServiceKernel>();
-                    services.AddHostedService<Worker>();
+                    services.AddSingleton<Kernel, ServiceKernel>();
+                    services.AddHostedService<SingleWorker>();
                 })
                 .UseSerilog();
 

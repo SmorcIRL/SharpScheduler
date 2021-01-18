@@ -14,7 +14,6 @@ namespace WrapperApplication.Project
     public class Program
     {
         private static readonly WrapperProcessArgs Args = new();
-
         private static Action _toLog;
 
         public static void Main(string[] args)
@@ -32,6 +31,8 @@ namespace WrapperApplication.Project
             builder.AddCommandLine(args);
             builder.Build().Bind(Args);
 
+            _toLog += () => Log.Information(LogStrings.Started);
+
             try
             {
                 string currentDir = Path.GetDirectoryName(Args.HandlerPath);
@@ -40,11 +41,10 @@ namespace WrapperApplication.Project
             }
             catch (Exception ex)
             {
-                _toLog += () => Log.Error("Cannot set current directory: {0}", ex);
+                _toLog += () => Log.Error("Cannot set current directory: \"{0}\"", ex);
             }
 
-            _toLog += () => Log.Information(LogStrings.Started);
-            _toLog += () => Log.Information("Current directory: {0}", Directory.GetCurrentDirectory());
+            _toLog += () => Log.Information("Current directory: \"{0}\"", Directory.GetCurrentDirectory());
         }
 
         private static void SetupLogger()
@@ -54,10 +54,7 @@ namespace WrapperApplication.Project
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .Enrich.FromLogContext();
 
-            if (Args.Log == null)
-            {
-                Args.Log = GetDefaultLogFileName();
-            }
+            Args.Log ??= GetDefaultLogFileName();
 
             try
             {
@@ -67,7 +64,7 @@ namespace WrapperApplication.Project
             }
             catch (Exception ex)
             {
-                _toLog += () => Log.Error("Cannot use file \"{0}\" as log, {1}", Args.Log, ex);
+                _toLog += () => Log.Error("Cannot use log file \"{0}\": {1}", Args.Log, ex);
 
                 Args.Log = GetDefaultLogFileName();
 
@@ -76,7 +73,7 @@ namespace WrapperApplication.Project
                     .CreateLogger();
             }
 
-            _toLog += () => Log.Information("Used log file: {0}", Args.Log);
+            _toLog += () => Log.Information("Used log file: \"{0}\"", Args.Log);
 
             static string GetDefaultLogFileName()
             {
@@ -97,32 +94,18 @@ namespace WrapperApplication.Project
             }
             finally
             {
-                Log.Information(LogStrings.Finished);
                 Log.CloseAndFlush();
             }
 
             static IHostBuilder CreateHostBuilder()
             {
                 return Host.CreateDefaultBuilder()
-                    .ConfigureAppConfiguration((_, config) =>
-                    {
-                        try
-                        {
-                            config.AddJsonFile(Args.Schedule, true);
-                            Log.Information("Used schedule file: {0}", Args.Schedule);
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Error("Cannot load schedule file: {0}", ex);
-                        }
-                    })
                     .ConfigureServices((_, services) =>
                     {
                         services.AddSingleton(Args);
-                        services.AddSingleton<Handler>();
                         services.AddSingleton<IScheduler, SimpleScheduler>();
-                        services.AddSingleton<WrapperKernel>();
-                        services.AddHostedService<Worker>();
+                        services.AddSingleton<Kernel, WrapperKernel>();
+                        services.AddHostedService<SingleWorker>();
                     })
                     .UseSerilog();
             }

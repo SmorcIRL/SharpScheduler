@@ -39,6 +39,5 @@ namespace SharpScheduler.Common
     public static class LogStrings
     {
         public const string Started = "[========================================[Started]========================================]";
-        public const string Finished = "[========================================[Finished]========================================]\n\n";
     }
 }

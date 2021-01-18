@@ -50,17 +50,18 @@ namespace CLI
         [LegalFilePath]
         public string Path { get; set; }
 
-        [Argument(2, Description = "Schedule file path")]
-        [LegalFilePath]
-        public string Schedule { get; set; }
-
-        [Argument(3, Description = "Log file path")]
+        [Argument(2, Description = "Log file path")]
         [LegalFilePath]
         public string Log { get; set; }
 
+        [Argument(3, Description = "Schedule file path")]
+        [LegalFilePath]
+        public string Schedule { get; set; }
+
+
         protected override async Task ProcessAsync(CommandLineApplication app)
         {
-            var response = await SendMessageAsyncToService(new {Path, Schedule, Log});
+            var response = await SendMessageAsyncToService(new {Path, Log, Schedule});
 
             Console.WriteLine(await response.GetMessageAsync());
         }
@@ -116,12 +117,7 @@ namespace CLI
 
         protected override async Task ProcessAsync(CommandLineApplication app)
         {
-            string json;
-
-            using (var reader = new StreamReader(Path))
-            {
-                json = await reader.ReadToEndAsync();
-            }
+            string json = await File.ReadAllTextAsync(Path);
 
             var response = await SendMessageAsyncToHandler(json, false);
 
@@ -162,10 +158,7 @@ namespace CLI
 
             if (response.IsSuccessStatusCode)
             {
-                await using (var writer = new StreamWriter(Path))
-                {
-                    await writer.WriteAsync(message);
-                }
+                await File.WriteAllTextAsync(Path, message);
 
                 Console.WriteLine($"Log saved to: \"{Path}\"");
             }

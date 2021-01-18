@@ -99,7 +99,7 @@ namespace SharpScheduler.Common
             catch (Exception ex)
             {
                 statusCode = HttpStatusCode.BadRequest;
-                handlingMessage = ex.ToString();
+                handlingMessage = ex.Message;
             }
 
             response.SetStatusCode(statusCode);

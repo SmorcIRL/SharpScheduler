@@ -97,7 +97,7 @@ namespace WrapperApplication.Scheduler
             {
                 if (!_notes.Any())
                 {
-                    return "No active triggers";
+                    return "No active triggers\n";
                 }
 
                 var table = new ConsoleTable(TableOptions);
@@ -193,8 +193,17 @@ namespace WrapperApplication.Scheduler
                 options.GetParams(out var firstTick, out var interval, out int maxTicks);
 
                 NextTick = firstTick;
-                Interval = interval < IntervalMin ? IntervalMin : interval;
-                TicksLeft = maxTicks;
+
+                if (interval <= TimeSpan.Zero)
+                {
+                    Interval = IntervalMin;
+                    TicksLeft = 1;
+                }
+                else
+                {
+                    Interval = interval < IntervalMin ? IntervalMin : interval;
+                    TicksLeft = maxTicks;
+                }
             }
 
             public long Id { get; }

@@ -42,14 +42,15 @@ dotnet publish Source/CLI/CLI.csproj -o Build -c Release
 [Unit]
 [Service]
 Type=simple
-ExecStart=dotnet Build/Service.dll
+WorkingDirectory=.../Build
+ExecStart=dotnet .../Build/Service.dll
 
 [Install]
 WantedBy=multi-user.target
 ```
 
 ```shell
-$ systemctl enable SchedulerService; systemctl start SchedulerService
+$ systemctl enable SchedulerService && systemctl start SchedulerService
  ```
 
 ### Интеграция в проект
@@ -124,7 +125,7 @@ namespace TestHandler
 
             if (result == 5)
             {
-                // Reason will be logged
+                // The reason will be logged
                 RequestDispose?.Invoke("Something gone wrong, it's time to stop");
                 return;
             }
@@ -228,10 +229,9 @@ namespace TestHandler
     "file.txt",
     "http://site.com"
   ],
-  // Задержка после старта, по умолчанию - сразу же
+  // Задержка после старта, по умолчанию - без задержки
   "Delay": "00:00:01",
-  // Интервал тиков, обязательно, по умолчанию - минимален (0.1 с)
-  // TODO: Это поведение изменится
+  // Интервал тиков, по умолчанию - бесконечен, а значит выполнится один раз
   "Interval": "00:00:01",
   // Количество тиков, по умолчанию = 1 (-1 для бесконечных тиков)
   "Ticks": 10
@@ -245,7 +245,7 @@ namespace TestHandler
 {
   // Во всех триггерах указываются "Command" и "Args"
 
-  // Дата и время, обязательно
+  // Дата и время, обязательны
   "Date": "08/18/2022 07:22:16",
 }
 
