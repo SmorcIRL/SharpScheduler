@@ -94,6 +94,8 @@ namespace WrapperApplication.Core
                     throw new Exception("Handler is disposing");
                 }
 
+                args = (string[]) args.Clone();
+
                 if (!_methods.TryGetValue(command, out var methodWrapper))
                 {
                     // Exception by default
